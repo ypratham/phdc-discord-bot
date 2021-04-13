@@ -4,18 +4,21 @@ import os
 import requests
 import json
 import random
-from keep_alive import keep_alive
 from replit import db
+from keep_alive import keep_alive
+
 
 #Variables
 client = discord.Client()
 
 bad_words = [
-    "Fuck", "fuck", "Fuck You", "Shit", "Piss off", "Fuck off", "Dick head", "Asshole",
-    "Son of a bitch", "Bastard", "Bitch", "Wanker"
+    "Fuck", "fuck", "Fuck You", "Shit", "Piss off", "Fuck off", "Dick head",
+    "Asshole", "Son of a bitch", "Bastard", "Bitch", "Wanker"
 ]
 
-sad_words = ["error", "build failed", "not working", "bug", "failed", "err", "buggy"]
+sad_words = [
+    "error", "build failed", "not working", "bug", "failed", "err", "buggy"
+]
 
 warning = [
     ">>> ⚠ Please avoid using Swear Words it is against our server policy!",
@@ -39,6 +42,7 @@ help_data = [
     ">>> **Help Commands** \n\nThese are the available commands:\n\n1. `!pdc help` - Dailogue of all commands\n2. `!pdc info` -  Gives info of bot\n3. `!pdc about` -  Returns server information\n4. `!pdc discord` - Provides invitation link for the discord server\n5. `!pdc github` - Provides link to the github organisation\n6. `!pdc core team` - Returns current Core Member\n7. `!pdc projects` - Returns active projects\n8. `!pdc quote`s - Returns random quote\n9. `!pdc events` - Returns upcoming events\n10. `!pdc new-event` - Add new event\n11. `!pdc delete-event` - Delete an event\n12. `!pdc list-events` - List all events\n\n _Our bot is Open Source_"
 ]
 
+
 #Setting up function for Quotes
 def get_quote():
     response = requests.get(
@@ -47,28 +51,28 @@ def get_quote():
     quote = json_data[0]['q'] + " - " + json_data[0]['a']
     return (quote)
 
-#Setting up funcyion for adding an event
-def add_event(event_name, event_date, event_time):
-  new_event = event_name, event_date, event_time
+#Setting up funcyion for adding an 
+def new_event(event_title, event_date, event_time):
+  new_event = event_title, event_date, event_time
   if "events" in db.keys():
-        events = db["events"]
-        events.append(new_event)
-        db["events"] = events
+    events = db["events"]
+    events.append(new_event)
+    db["events"] = events
   else:
-      db["events"] = [(new_event)]
-        
-#Setting up function for deleting an event
-def delete_event(index):
-  event = db["events"]
-  if len(event) > index:
-    del event[index]
-    db["events"] = event
-  
+    db["events"] = [(new_event)]
+
+def remove_event(index):
+  events = db["events"]
+  if len(events) > index:
+    del events[index]
+    db["events"] = events
+
 #Creating Login message
 @client.event
 async def on_ready():
     print('Bot is now live as {0.user}'.format(client) +
           (' at PHP-DC Discord Server'))
+
 
 @client.event
 async def on_message(message):
@@ -108,7 +112,7 @@ async def on_message(message):
 #Condition projects
     if msg.startswith('!pdc projects'):
         await message.channel.send(''.join(projects))
- 
+
 #Condition requesting Quotes
     if msg.startswith('!pdc quote'):
         quote = get_quote()
@@ -122,30 +126,30 @@ async def on_message(message):
     if any(word in msg for word in sad_words):
 
         await message.channel.send(''.join(solution))
-        
+
 #Condition for adding an event
     if msg.startswith("!pdc new-event"):
-      msg_array = msg.split("|")
-      event_name = msg_array[1]
-      event_date = msg_array[2]
-      event_time = msg_array[3]
-      add_event(event_name, event_date, event_time)
-      await message.channel.send(">>> New event added!")
-        
-#Condition for deleting an event 
-    if msg.startswith("!pdc delete-event"):
-      index = int(msg.split("!pdc delete-event",1)[1])
-      delete_event(index)
-      await message.channel.send(">>> Succesfully deleted the event")
-    
+        msg_array = msg.split("|")
+        event_title = msg_array[1]
+        event_date = msg_array[2]
+        event_time = msg_array[3]
+        new_event(event_title, event_date, event_time)
+        await message.channel.send(">>> New event added!")
+
 #Condition to view all the events currently in the database
     if msg.startswith("!pdc list-events"):
-      events = db["events"].value
-      for event_name, event_date, event_time in events:
-          await message.channel.send(">>> **Event**: {} | **Date**: {} | **Time**: {}"
-          .format(event_name, event_date, event_time))
+        events = db["events"].value
+        for event_title, event_date, event_time in events:
+          await message.channel.send(" {} | {} | {} ".format(event_title, event_date, event_time))
+    
 
-#Running Bot
+#Condition for deleting events
+    if msg.startswith("!pdc delete event"):
+      index = int(msg.split("!pdc delete event",1)[1])
+      remove_event(index)
+      await message.channel.send(">>> Event Deleted")
+
+#Keep Alive
 keep_alive()
 
 client.run(os.getenv('botTOKEN'))
