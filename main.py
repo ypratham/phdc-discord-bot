@@ -129,13 +129,13 @@ async def on_message(message):
       event_name = msg_array[1]
       event_date = msg_array[2]
       event_time = msg_array[3]
-      add_events(event_name, event_date, event_time)
+      add_event(event_name, event_date, event_time)
       await message.channel.send(">>> New event added!")
         
 #Condition for deleting an event 
     if msg.startswith("!pdc delete-event"):
       index = int(msg.split("!pdc delete-event",1)[1])
-      delete_events(index)
+      delete_event(index)
       await message.channel.send(">>> Succesfully deleted the event")
     
 #Condition to view all the events currently in the database
