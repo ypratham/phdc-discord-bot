@@ -39,9 +39,12 @@ core_team_1 = [
 ]
 
 help_data = [
-    ">>> **Help Commands** \n\nThese are the available commands:\n\n1. `!pdc help` - Dailogue of all commands\n2. `!pdc info` -  Gives info of bot\n3. `!pdc about` -  Returns server information\n4. `!pdc discord` - Provides invitation link for the discord server\n5. `!pdc github` - Provides link to the github organisation\n6. `!pdc core team` - Returns current Core Member\n7. `!pdc projects` - Returns active projects\n8. `!pdc quote`s - Returns random quote\n9. `!pdc events` - Returns upcoming events\n10. `!pdc new-event` - Add new event\n11. `!pdc delete-event` - Delete an event\n12. `!pdc list-events` - List all events\n\n _Our bot is Open Source_"
+    ">>> **Help Commands** \n\nThese are the available commands:\n\n1. `!pdc help` - Dailogue of all commands\n2. `!pdc info` -  Gives info of bot\n3. `!pdc about` -  Returns server information\n4. `!pdc discord` - Provides invitation link for the discord server\n5. `!pdc github` - Provides link to the github organisation\n6. `!pdc core team` - Returns current Core Member\n7. `!pdc projects` - Returns active projects\n8. `!pdc quote`s - Returns random quote\n9. `!pdc events` - Returns upcoming events\n10. `!pdc new-event` - Add new event\n11. `!pdc delete-event` - Delete an event\n12. `!pdc list-events` - List all events\n13. `!pdc event-syntax` - List all syntax for events command\n\n _Our bot is Open Source_"
 ]
 
+event_syntax = [
+    ">>> `!php new-event | <event-title> | <event_time>`\n`!php delete index_value`"
+]
 
 #Setting up function for Quotes
 def get_quote():
@@ -148,6 +151,11 @@ async def on_message(message):
       index = int(msg.split("!pdc delete event",1)[1])
       remove_event(index)
       await message.channel.send(">>> Event Deleted")
+
+#Condition to view all event related syntax
+    if msg.startswith("!pdc event-syntax"):
+        
+        await message.channel.send(event_syntax)
 
 #Keep Alive
 keep_alive()
