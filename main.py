@@ -5,6 +5,7 @@ import requests
 import json
 import random
 from keep_alive import keep_alive
+from replit import db
 
 #Variables
 client = discord.Client()
@@ -46,6 +47,23 @@ def get_quote():
     quote = json_data[0]['q'] + " - " + json_data[0]['a']
     return (quote)
 
+#Setting up funcyion for adding an event
+def add_event(event_name, event_date, event_time):
+  new_event = event_name, event_date, event_time
+  if "events" in db.keys():
+        events = db["events"]
+        events.append(new_event)
+        db["events"] = events
+  else:
+      db["events"] = [(new_event)]
+        
+#Setting up function for deleting an event
+def delete_event(index):
+  event = db["events"]
+  if len(event) > index:
+    del event[index]
+    db["events"] = event
+  
 #Creating Login message
 @client.event
 async def on_ready():
@@ -104,6 +122,28 @@ async def on_message(message):
     if any(word in msg for word in sad_words):
 
         await message.channel.send(''.join(solution))
+        
+#Condition for adding an event
+    if msg.startswith("!pdc new-event"):
+      msg_array = msg.split("|")
+      event_name = msg_array[1]
+      event_date = msg_array[2]
+      event_time = msg_array[3]
+      add_events(event_name, event_date, event_time)
+      await message.channel.send(">>> New event added!")
+        
+#Condition for deleting an event 
+    if msg.startswith("!pdc delete-event"):
+      index = int(msg.split("!pdc delete-event",1)[1])
+      delete_events(index)
+      await message.channel.send(">>> Succesfully deleted the event")
+    
+#Condition to view all the events currently in the database
+    if msg.startswith("!pdc list-events"):
+      events = db["events"].value
+      for event_name, event_date, event_time in events:
+          await message.channel.send(">>> **Event**: {} | **Date**: {} | **Time**: {}"
+          .format(event_name, event_date, event_time))
 
 #Running Bot
 keep_alive()
