@@ -171,22 +171,15 @@ async def on_message(message):
     if msg.startswith("!pdc event-syntax"):
         
         await message.channel.send('>>> '.join(event_syntax))
-        
-@client.event
-async def on_message(message):
-
-  msg = message.content
-
-  if message.author == client.user:
-    return
+       
 
 #Condition to return random meme
-  if msg.startswith('$meme'):
+  if msg.startswith('!meme'):
     meme = random_meme()
     await message.channel.send(meme)
 
 #Condition to return random jokes
-  if msg.startswith('$joke'):
+  if msg.startswith('!joke'):
     joke = random_joke()
     await message.channel.send(">>> " + joke)
 
