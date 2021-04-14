@@ -43,7 +43,7 @@ help_data = [
 ]
 
 event_syntax = [
-    ">>> `!php new-event | <event-title> | <event_time>`\n`!php delete index_value`"
+    "`!php new-event | <event-title> | <event_time>`\n`!php delete index_value`"
 ]
 
 #Setting up function for Quotes
@@ -155,7 +155,7 @@ async def on_message(message):
 #Condition to view all event related syntax
     if msg.startswith("!pdc event-syntax"):
         
-        await message.channel.send(event_syntax)
+        await message.channel.send('>>> '.join(event_syntax))
 
 #Keep Alive
 keep_alive()
