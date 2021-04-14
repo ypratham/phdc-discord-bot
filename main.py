@@ -4,6 +4,7 @@ import os
 import requests
 import json
 import random
+import urllib
 from replit import db
 from keep_alive import keep_alive
 
@@ -196,12 +197,12 @@ async def on_message(message):
        
 
 #Condition to return random meme
-  if msg.startswith('!meme'):
+  if msg.startswith('!pdc meme'):
     meme = random_meme()
     await message.channel.send(meme)
 
 #Condition to return random jokes
-  if msg.startswith('!joke'):
+  if msg.startswith('!pdc joke'):
     joke = random_joke()
     await message.channel.send(">>> " + joke)
 
