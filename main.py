@@ -39,7 +39,7 @@ core_team_1 = [
 ]
 
 help_data = [
-    ">>> **Help Commands** \n\nThese are the available commands:\n\n1. `!pdc help` - Dailogue of all commands\n2. `!pdc info` -  Gives info of bot\n3. `!pdc about` -  Returns server information\n4. `!pdc discord` - Provides invitation link for the discord server\n5. `!pdc github` - Provides link to the github organisation\n6. `!pdc core team` - Returns current Core Member\n7. `!pdc projects` - Returns active projects\n8. `!pdc quote`s - Returns random quote\n9. `!pdc events` - Returns upcoming events\n10. `!pdc new-event` - Add new event\n11. `!pdc delete-event` - Delete an event\n12. `!pdc list-events` - List all events\n13. `!pdc event-syntax` - List all syntax for events command\n\n _Our bot is Open Source_"
+    ">>> **Help Commands** \n\nThese are the available commands:\n\n1. `!pdc help` - Dailogue of all commands\n2. `!pdc info` -  Gives info of bot\n3. `!pdc about` -  Returns server information\n4. `!pdc discord` - Provides invitation link for the discord server\n5. `!pdc github` - Provides link to the github organisation\n6. `!pdc core team` - Returns current Core Member\n7. `!pdc projects` - Returns active projects\n8. `!pdc quote`s - Returns random quote\n9. `!pdc events` - Returns upcoming events\n10. `!pdc new-event` - Add new event\n11. `!pdc delete-event` - Delete an event\n12. `!pdc list-events` - List all events\n13. `!pdc event-syntax` - List all syntax for events command\n14. `!pdc new-project` - add new project to the list\n15. `!pdc delete-project` - delete a project from the list\n\n _Our bot is Open Source_"
 ]
 
 event_syntax = [
@@ -64,6 +64,7 @@ def new_event(event_title, event_date, event_time):
   else:
     db["events"] = [(new_event)]
 
+#Setting function for deleting an event
 def remove_event(index):
   events = db["events"]
   if len(events) > index:
@@ -85,6 +86,23 @@ def random_joke():
   data = json.loads(response.read())
   joke = data["joke"]
   return joke
+
+#Setting function for adding an project
+def new_project(project_title, project_members):
+  new_project = project_title, project_members
+  if "project" in db.keys():
+    events = db["project"]
+    events.append(new_project)
+    db["project"] = events
+  else:
+    db["project"] = [(new_project)]
+    
+#Setting function for removing an project
+ def remove_project(project):
+  project = db["project"]
+  if len(project) > index:
+    del project[index]
+    db["project"] = project
 
 #Creating Login message
 @client.event
@@ -129,8 +147,12 @@ async def on_message(message):
 
 #Condition projects
     if msg.startswith('!pdc projects'):
-        await message.channel.send(''.join(projects))
-
+        project = db["project"].value
+        index = 0
+        for project_title, project_members in proeject:
+            await message.channel.send(">>> {} Project : {} | Members : {}  ".format(index, project_title, project_members))
+            index += 1
+        
 #Condition requesting Quotes
     if msg.startswith('!pdc quote'):
         quote = get_quote()
@@ -182,6 +204,21 @@ async def on_message(message):
   if msg.startswith('!joke'):
     joke = random_joke()
     await message.channel.send(">>> " + joke)
+
+#Condition for adding new projects
+    if msg.startswith("!pdc new-project"):
+        project_msg_array = msg.split('|')
+        project_title = project_msg_array[1]
+        project_members = project_msg_array[1]
+        new_project(project_title, project_members)
+        await message.channel.send(">>> New project added!")
+        
+#Condition for delteing project
+    if msg.startswith("!pdc delete-project"):
+        index = (msg.split("pdc delete-projecct",1)[1])
+        delete_project(index)
+        await message.channel.send(">>> Project deleted successfully")
+
 
 #Keep Alive
 keep_alive()
