@@ -31,10 +31,6 @@ solution = [
     ">>> 🤔 I think you should find something on stackoverflow !\n💡 Tip: Sharing your project link is also helpful"
 ]
 
-projects = [
-    ">>> **Live Projects** \n1. Discord Bot\n2. PDC Application\n3. PDC Website\n4. Hacktober Practice\n5. Hacktober Website\n6. API"
-]
-
 core_team_1 = [
     ">>> **Core Team** \n1. Lead: Random Name\n2. Co Lead: Random Name\n3. Web Lead: Random Name"
 ]
@@ -55,7 +51,7 @@ def get_quote():
     quote = json_data[0]['q'] + " - " + json_data[0]['a']
     return (quote)
 
-#Setting up funcyion for adding an 
+#Setting up funcyion for adding events
 def new_event(event_title, event_date, event_time):
   new_event = event_title, event_date, event_time
   if "events" in db.keys():
@@ -71,21 +67,21 @@ def remove_event(index):
     del events[index]
     db["events"] = events
 
-#Setting up funcyion for adding an 
-def new_projects(project_title):
-  new_project = project_title
+#Setting up function for adding projects
+def newProject(projectTitle, projectType):
+  new_project = projectTitle, projectType
   if "projects" in db.keys():
-    new_project = db["projects"]
-    new_project.append(new_project)
-    db["projects"] = new_project
+    projects = db["projects"]
+    projects.append(new_project)
+    db["projects"] = projects
   else:
-    db["projects"] = [(new_project)]
+    db["projects"] = projects
 
-def remove_projects(index):
-  new_project = db["projects"]
-  if len(new_project) > index:
-    del new_project[index]
-    db["projects"] = new_project
+def removeProject(index):
+  projects = db["projects"]
+  if len(projects) > index:
+    del projects[index]
+    db["projects"] = projects
 
 #Function to return random meme images URL
 def random_meme():
@@ -144,25 +140,6 @@ async def on_message(message):
     if msg.startswith('!pdc core team'):
         await message.channel.send(''.join(core_team_1))
 
-#Condition to view all the events currently in the database
-    if msg.startswith("!pdc list projects"):
-        projects = db["projects"].value
-        for project_title in projects:
-          await message.channel.send(" {} |  ".format(project_title))
-
-#Condition for adding an event
-    if msg.startswith("!pdc new project"):
-        msg_array = msg.split("|")
-        project_title = msg_array[1]
-        new_projects(project_title)
-        await message.channel.send(">>> New Project added!")
-
-#Condition for deleting events
-    if msg.startswith("!pdc mark project completed"):
-      index = int(msg.split("!pdc mark project completed",1)[1])
-      remove_projects(index)
-      await message.channel.send(">>> Projected Completed!")
-
 #Condition requesting Quotes
     if msg.startswith('!pdc quote'):
         quote = get_quote()
@@ -201,6 +178,26 @@ async def on_message(message):
 #Condition to view all event related syntax
     if msg.startswith("!pdc event-syntax"):
         await message.channel.send('>>> '.join(event_syntax))
+
+#Condition to view projects
+    if msg.startswith("!pdc list projects"):
+      projects = db["projects"].value
+      for projectTitle, projectType in projects:
+        await message.channel.send("{} | {} ".format(projectTitle, projectType))
+
+#Condition to Add Projects
+    if msg.startswith("!pdc new project"):
+      project_msg_array = msg.split("|")
+      projectTitle = project_msg_array[1]
+      projectType = project_msg_array[2]
+      newProject(projectTitle, projectType)
+      await message.channel.send(">>> Project Added")
+
+#Condition to Delete Project
+    if msg.startswith("!pdc project completed"):
+      index = int(msg.split("!pdc project completed",1)[1])
+      removeProject(index)
+      await message.channel.send(">>> Project Completed")
 
 #Condition to return random meme
     if msg.startswith('!pdc meme'):
