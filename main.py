@@ -69,14 +69,29 @@ def remove_event(index):
   if len(events) > index:
     del events[index]
     db["events"] = events
+    
+#Function to return random meme images URL
+def random_meme():
+  url =  "https://some-random-api.ml/meme"
+  response = urllib.request.urlopen(url)
+  data = json.loads(response.read())
+  path = data["image"]
+  return path
+
+#Function to return random jokes 
+def random_joke():
+  url = "https://some-random-api.ml/joke"
+  response = urllib.request.urlopen(url)
+  data = json.loads(response.read())
+  joke = data["joke"]
+  return joke
 
 #Creating Login message
 @client.event
 async def on_ready():
     print('Bot is now live as {0.user}'.format(client) +
           (' at PHP-DC Discord Server'))
-
-
+ 
 @client.event
 async def on_message(message):
     #Variables Ease
@@ -156,6 +171,24 @@ async def on_message(message):
     if msg.startswith("!pdc event-syntax"):
         
         await message.channel.send('>>> '.join(event_syntax))
+        
+@client.event
+async def on_message(message):
+
+  msg = message.content
+
+  if message.author == client.user:
+    return
+
+#Condition to return random meme
+  if msg.startswith('$meme'):
+    meme = random_meme()
+    await message.channel.send(meme)
+
+#Condition to return random jokes
+  if msg.startswith('$joke'):
+    joke = random_joke()
+    await message.channel.send(">>> " + joke)
 
 #Keep Alive
 keep_alive()
