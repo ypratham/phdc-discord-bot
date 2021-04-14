@@ -4,6 +4,7 @@ import os
 import requests
 import json
 import random
+import urllib
 from replit import db
 from keep_alive import keep_alive
 
