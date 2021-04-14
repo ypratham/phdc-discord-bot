@@ -4,6 +4,7 @@ import os
 import requests
 import json
 import random
+import urllib
 from replit import db
 from keep_alive import keep_alive
 
@@ -39,9 +40,12 @@ core_team_1 = [
 ]
 
 help_data = [
-    ">>> **Help Commands** \n\nThese are the available commands:\n\n1. `!pdc help` - Dailogue of all commands\n2. `!pdc info` -  Gives info of bot\n3. `!pdc about` -  Returns server information\n4. `!pdc discord` - Provides invitation link for the discord server\n5. `!pdc github` - Provides link to the github organisation\n6. `!pdc core team` - Returns current Core Member\n7. `!pdc projects` - Returns active projects\n8. `!pdc quote`s - Returns random quote\n9. `!pdc events` - Returns upcoming events\n10. `!pdc new-event` - Add new event\n11. `!pdc delete-event` - Delete an event\n12. `!pdc list-events` - List all events\n\n _Our bot is Open Source_"
+    ">>> **Help Commands** \n\nThese are the available commands:\n\n1. `!pdc help` - Dailogue of all commands\n2. `!pdc info` -  Gives info of bot\n3. `!pdc about` -  Returns server information\n4. `!pdc discord` - Provides invitation link for the discord server\n5. `!pdc github` - Provides link to the github organisation\n6. `!pdc core team` - Returns current Core Member\n7. `!pdc projects` - Returns active projects\n8. `!pdc quote`s - Returns random quote\n9. `!pdc events` - Returns upcoming events\n10. `!pdc new-event` - Add new event\n11. `!pdc delete-event` - Delete an event\n12. `!pdc list-events` - List all events\n13. `!pdc event-syntax` - List all syntax for events command\n14. `!pdc new-project` - add new project to the list\n15. `!pdc delete-project` - delete a project from the list\n\n _Our bot is Open Source_"
 ]
 
+event_syntax = [
+    "`!php new-event | <event-title> | <event_time>`\n`!php delete index_value`"
+]
 
 #Setting up function for Quotes
 def get_quote():
@@ -61,19 +65,52 @@ def new_event(event_title, event_date, event_time):
   else:
     db["events"] = [(new_event)]
 
+#Setting function for deleting an event
 def remove_event(index):
   events = db["events"]
   if len(events) > index:
     del events[index]
     db["events"] = events
+    
+#Function to return random meme images URL
+def random_meme():
+  url =  "https://some-random-api.ml/meme"
+  response = urllib.request.urlopen(url)
+  data = json.loads(response.read())
+  path = data["image"]
+  return path
+
+#Function to return random jokes 
+def random_joke():
+  url = "https://some-random-api.ml/joke"
+  response = urllib.request.urlopen(url)
+  data = json.loads(response.read())
+  joke = data["joke"]
+  return joke
+
+#Setting function for adding an project
+def new_project(project_title, project_members):
+  new_project = project_title, project_members
+  if "project" in db.keys():
+    events = db["project"]
+    events.append(new_project)
+    db["project"] = events
+  else:
+    db["project"] = [(new_project)]
+    
+#Setting function for removing an project
+ def remove_project(project):
+  project = db["project"]
+  if len(project) > index:
+    del project[index]
+    db["project"] = project
 
 #Creating Login message
 @client.event
 async def on_ready():
     print('Bot is now live as {0.user}'.format(client) +
           (' at PHP-DC Discord Server'))
-
-
+ 
 @client.event
 async def on_message(message):
     #Variables Ease
@@ -111,8 +148,12 @@ async def on_message(message):
 
 #Condition projects
     if msg.startswith('!pdc projects'):
-        await message.channel.send(''.join(projects))
-
+        project = db["project"].value
+        index = 0
+        for project_title, project_members in proeject:
+            await message.channel.send(">>> {} Project : {} | Members : {}  ".format(index, project_title, project_members))
+            index += 1
+        
 #Condition requesting Quotes
     if msg.startswith('!pdc quote'):
         quote = get_quote()
@@ -148,6 +189,37 @@ async def on_message(message):
       index = int(msg.split("!pdc delete event",1)[1])
       remove_event(index)
       await message.channel.send(">>> Event Deleted")
+
+#Condition to view all event related syntax
+    if msg.startswith("!pdc event-syntax"):
+        
+        await message.channel.send('>>> '.join(event_syntax))
+       
+
+#Condition to return random meme
+  if msg.startswith('!pdc meme'):
+    meme = random_meme()
+    await message.channel.send(meme)
+
+#Condition to return random jokes
+  if msg.startswith('!pdc joke'):
+    joke = random_joke()
+    await message.channel.send(">>> " + joke)
+
+#Condition for adding new projects
+    if msg.startswith("!pdc new-project"):
+        project_msg_array = msg.split('|')
+        project_title = project_msg_array[1]
+        project_members = project_msg_array[1]
+        new_project(project_title, project_members)
+        await message.channel.send(">>> New project added!")
+        
+#Condition for delteing project
+    if msg.startswith("!pdc delete-project"):
+        index = (msg.split("pdc delete-projecct",1)[1])
+        delete_project(index)
+        await message.channel.send(">>> Project deleted successfully")
+
 
 #Keep Alive
 keep_alive()
