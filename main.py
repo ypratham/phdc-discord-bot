@@ -3,6 +3,7 @@ import discord
 import os
 import requests
 import json
+import urllib
 import random
 from replit import db
 from keep_alive import keep_alive
@@ -30,20 +31,16 @@ solution = [
     ">>> 🤔 I think you should find something on stackoverflow !\n💡 Tip: Sharing your project link is also helpful"
 ]
 
-projects = [
-    ">>> **Live Projects** \n1. Discord Bot\n2. PDC Application\n3. PDC Website\n4. Hacktober Practice\n5. Hacktober Website\n6. API"
-]
-
 core_team_1 = [
     ">>> **Core Team** \n1. Lead: Random Name\n2. Co Lead: Random Name\n3. Web Lead: Random Name"
 ]
 
 help_data = [
-    ">>> **Help Commands** \n\nThese are the available commands:\n\n1. `!pdc help` - Dailogue of all commands\n2. `!pdc info` -  Gives info of bot\n3. `!pdc about` -  Returns server information\n4. `!pdc discord` - Provides invitation link for the discord server\n5. `!pdc github` - Provides link to the github organisation\n6. `!pdc core team` - Returns current Core Member\n7. `!pdc projects` - Returns active projects\n8. `!pdc quote`s - Returns random quote\n9. `!pdc events` - Returns upcoming events\n10. `!pdc new-event` - Add new event\n11. `!pdc delete-event` - Delete an event\n12. `!pdc list-events` - List all events\n13. `!pdc event-syntax` - List all syntax for events command\n14. `!pdc new-project` - add new project to the list\n15. `!pdc delete-project` - delete a project from the list\n\n _Our bot is Open Source_"
+     ">>> **Help Commands** \n\nThese are the available commands:\n\n1. `!pdc help` - Dailogue of all commands\n2. `!pdc info` -  Gives info of bot\n3. `!pdc about` -  Returns server information\n4. `!pdc discord` - Provides invitation link for the discord server\n5. `!pdc github` - Provides link to the github organisation\n6. `!pdc core team` - Returns current Core Member\n7. `!pdc list projects` - Returns active projects\n8. `!pdc quote`s - Returns random quote\n9. `!pdc events` - Returns upcoming events\n10. `!pdc new-event` - Add new event\n11. `!pdc delete-event` - Delete an event\n12. `!pdc list-events` - List all events\n13. `!pdc event-syntax` - List all syntax for events command\n14. `!pdc new project` - add new project to the list\n15. `!pdc delete project` - delete a project from the list\n16. `!pdc meme` - Returns meme\n17. `!pdc joke` - Returns a joke\n\n _Our bot is Open Source_"
 ]
 
 event_syntax = [
-    "`!php new-event | <event-title> | <event_time>`\n`!php delete index_value`"
+    "`!pdc new-event | <event-title> | <event_time>`\n`!php delete index_value`"
 ]
 
 #Setting up function for Quotes
@@ -54,7 +51,7 @@ def get_quote():
     quote = json_data[0]['q'] + " - " + json_data[0]['a']
     return (quote)
 
-#Setting up funcyion for adding an 
+#Setting up funcyion for adding events
 def new_event(event_title, event_date, event_time):
   new_event = event_title, event_date, event_time
   if "events" in db.keys():
@@ -64,29 +61,42 @@ def new_event(event_title, event_date, event_time):
   else:
     db["events"] = [(new_event)]
 
-#Setting function for deleting an event
 def remove_event(index):
   events = db["events"]
   if len(events) > index:
     del events[index]
     db["events"] = events
 
-#Setting function for adding an project
-def new_project(project_title, project_members):
-  new_project = project_title, project_members
-  if "project" in db.keys():
-    events = db["project"]
-    events.append(new_project)
-    db["project"] = events
+#Setting up function for adding projects
+def newProject(projectTitle, projectType):
+  new_project = projectTitle, projectType
+  if "projects" in db.keys():
+    projects = db["projects"]
+    projects.append(new_project)
+    db["projects"] = projects
   else:
-    db["project"] = [(new_project)]
-    
-#Setting function for removing an project
- def remove_project(project):
-  project = db["project"]
-  if len(project) > index:
-    del project[index]
-    db["project"] = project
+    db["projects"] = projects
+
+def removeProject(index):
+  projects = db["projects"]
+  if len(projects) > index:
+    del projects[index]
+    db["projects"] = projects
+
+#Function to return random meme images URL
+def random_meme():
+  url =  "https://some-random-api.ml/meme"
+  response = urllib.request.urlopen(url)
+  data = json.loads(response.read())
+  path = data["image"]
+  return path
+#Function to return random jokes 
+def random_joke():
+  url = "https://some-random-api.ml/joke"
+  response = urllib.request.urlopen(url)
+  data = json.loads(response.read())
+  joke = data["joke"]
+  return joke
 
 #Creating Login message
 @client.event
@@ -130,14 +140,6 @@ async def on_message(message):
     if msg.startswith('!pdc core team'):
         await message.channel.send(''.join(core_team_1))
 
-#Condition projects
-    if msg.startswith('!pdc projects'):
-        project = db["project"].value
-        index = 0
-        for project_title, project_members in proeject:
-            await message.channel.send(">>> {} Project : {} | Members : {}  ".format(index, project_title, project_members))
-            index += 1
-        
 #Condition requesting Quotes
     if msg.startswith('!pdc quote'):
         quote = get_quote()
@@ -152,21 +154,20 @@ async def on_message(message):
 
         await message.channel.send(''.join(solution))
 
+#Condition to view all the events currently in the database
+    if msg.startswith("!pdc list events"):
+        events = db["events"].value
+        for event_title, event_date, event_time in events:
+          await message.channel.send(" {} | {} | {} ".format(event_title, event_date, event_time))
+
 #Condition for adding an event
-    if msg.startswith("!pdc new-event"):
+    if msg.startswith("!pdc new event"):
         msg_array = msg.split("|")
         event_title = msg_array[1]
         event_date = msg_array[2]
         event_time = msg_array[3]
         new_event(event_title, event_date, event_time)
         await message.channel.send(">>> New event added!")
-
-#Condition to view all the events currently in the database
-    if msg.startswith("!pdc list-events"):
-        events = db["events"].value
-        for event_title, event_date, event_time in events:
-          await message.channel.send(" {} | {} | {} ".format(event_title, event_date, event_time))
-    
 
 #Condition for deleting events
     if msg.startswith("!pdc delete event"):
@@ -176,23 +177,37 @@ async def on_message(message):
 
 #Condition to view all event related syntax
     if msg.startswith("!pdc event-syntax"):
-        
         await message.channel.send('>>> '.join(event_syntax))
 
-#Condition for adding new projects
-    if msg.startswith("!pdc new-project"):
-        project_msg_array = msg.split('|')
-        project_title = project_msg_array[1]
-        project_members = project_msg_array[1]
-        new_project(project_title, project_members)
-        await message.channel.send(">>> New project added!")
-        
-#Condition for delteing project
-    if msg.startswith("!pdc delete-project"):
-        index = (msg.split("pdc delete-projecct",1)[1])
-        delete_project(index)
-        await message.channel.send(">>> Project deleted successfully")
+#Condition to view projects
+    if msg.startswith("!pdc list projects"):
+      projects = db["projects"].value
+      for projectTitle, projectType in projects:
+        await message.channel.send("{} | {} ".format(projectTitle, projectType))
 
+#Condition to Add Projects
+    if msg.startswith("!pdc new project"):
+      project_msg_array = msg.split("|")
+      projectTitle = project_msg_array[1]
+      projectType = project_msg_array[2]
+      newProject(projectTitle, projectType)
+      await message.channel.send(">>> Project Added")
+
+#Condition to Delete Project
+    if msg.startswith("!pdc project completed"):
+      index = int(msg.split("!pdc project completed",1)[1])
+      removeProject(index)
+      await message.channel.send(">>> Project Completed")
+
+#Condition to return random meme
+    if msg.startswith('!pdc meme'):
+      meme = random_meme()
+      await message.channel.send(meme)
+
+#Condition to return random jokes
+    if msg.startswith('!pdc joke'):
+      joke = random_joke()
+      await message.channel.send(">>> " + joke)
 
 #Keep Alive
 keep_alive()
