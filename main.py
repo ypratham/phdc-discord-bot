@@ -36,7 +36,7 @@ core_team_1 = [
 ]
 
 help_data = [
-     ">>> **Help Commands** \n\nThese are the available commands:\n\n1. `!pdc help` - Dailogue of all commands\n2. `!pdc info` -  Gives info of bot\n3. `!pdc about` -  Returns server information\n4. `!pdc discord` - Provides invitation link for the discord server\n5. `!pdc github` - Provides link to the github organisation\n6. `!pdc core team` - Returns current Core Member\n7. `!pdc list projects` - Returns active projects\n8. `!pdc quote`s - Returns random quote\n9. `!pdc events` - Returns upcoming events\n10. `!pdc new-event` - Add new event\n11. `!pdc delete-event` - Delete an event\n12. `!pdc list-events` - List all events\n13. `!pdc event-syntax` - List all syntax for events command\n14. `!pdc new project` - add new project to the list\n15. `!pdc delete project` - delete a project from the list\n16. `!pdc meme` - Returns meme\n17. `!pdc joke` - Returns a joke\n\n _Our bot is Open Source_"
+     ">>> **Help Commands** \n\nThese are the available commands:\n\n1. `!pdc help` - Dailogue of all commands\n2. `!pdc info` -  Gives info of bot\n3. `!pdc about` -  Returns server information\n4. `!pdc discord` - Provides invitation link for the discord server\n5. `!pdc github` - Provides link to the github organisation\n6. `!pdc core team` - Returns current Core Member\n7. `!pdc list projects` - Returns active projects\n8. `!pdc quote`s - Returns random quote\n9. `!pdc events` - Returns upcoming events\n10. `!pdc new-event` - Add new event\n11. `!pdc delete-event` - Delete an event\n12. `!pdc list-events` - List all events\n13. `!pdc event-syntax` - List all syntax for events command\n14. `!pdc new project` - add new project to the list\n15. `!pdc delete project` - delete a project from the list\n16. `!pdc meme` - Returns meme\n17. `!pdc joke` - Returns a joke\n18. `!pdc search github` - get the github url of a user\n\n _Our bot is Open Source_"
 ]
 
 event_syntax = [
@@ -97,6 +97,13 @@ def random_joke():
   data = json.loads(response.read())
   joke = data["joke"]
   return joke
+
+#Function which return a github url
+def github_search_user(user_name_to_search):
+  response = urllib.request.urlopen("https://api.github.com/users/" + user_name_to_search )
+  data = json.loads(response.read())
+  git_url = data["html_url"]
+  return git_url
 
 #Creating Login message
 @client.event
@@ -209,6 +216,12 @@ async def on_message(message):
       joke = random_joke()
       await message.channel.send(">>> " + joke)
 
+#Condition to search a user in github
+    if msg.startswith('!pdc search github'):
+      user_to_be_searched = msg.split(" ",3)[3]
+      git_result = github_search_user(user_to_be_searched)
+      await message.channel.send(">>> " + git_result[0])
+    
 #Keep Alive
 keep_alive()
 
