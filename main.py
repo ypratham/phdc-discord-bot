@@ -234,7 +234,6 @@ async def on_message(message):
     if msg.startswith('!pdc search github'):
       user_to_be_searched = msg.split(" ",3)[3]
       git_result = github_search_user(user_to_be_searched)
-      await message.channel.send(">>> " + git_result[0])
 
       github_url = git_result[0]
       github_repo_size = str(git_result[1])
@@ -249,6 +248,8 @@ async def on_message(message):
       embed.add_field(name = "Repository", value = github_repo_size,inline = False)
       embed.add_field(name = "Followers", value=github_followers,inline = True)
       embed.add_field(name = "Following", value=github_following,inline = True)
+    
+      await message.channel.send(embed=embed)
     
 #Keep Alive
 keep_alive()
