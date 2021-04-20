@@ -90,6 +90,7 @@ def random_meme():
   data = json.loads(response.read())
   path = data["image"]
   return path
+
 #Function to return random jokes 
 def random_joke():
   url = "https://some-random-api.ml/joke"
@@ -104,19 +105,15 @@ def github_search_user(user_name_to_search):
   data = json.loads(response.read())
   #All data from github json
   git_url = data["html_url"]
-  github_repos = data["repos_url"]
+  github_repos = data["public_repos"]
   user_name = data["login"]
   github_avatar_url = data["avatar_url"]
   github_follower = data["followers"]
   github_bio = data["bio"]
   github_following = data["following"]
 
-  repo_state = urllib.request.urlopen(github_repos)
-  repo_data = json.loads(repo_state.read())
-  repo_length = len(repo_data)
 
-
-  github_resource = [github_url,repo_length,user_name,github_avatar_url,github_follower,github_bio,github_following]
+  github_resource = [github_url,github_repos,user_name,github_avatar_url,github_follower,github_bio,github_following]
   return github_resource
 
 #Creating Login message
