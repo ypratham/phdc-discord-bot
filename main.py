@@ -7,6 +7,7 @@ import urllib
 import random
 from replit import db
 from keep_alive import keep_alive
+from PIL import Image, ImageFont, ImageDraw, ImageOps
 
 
 #Variables
@@ -247,7 +248,56 @@ async def on_message(message):
       embed.add_field(name = "Following", value=github_following,inline = True)
     
       await message.channel.send(embed=embed)
-    
+
+
+@client.event
+async def on_member_join(member):
+  
+# server Id 
+  guild = client.get_guild(791606163954991144) #(726038923410669578 )
+# welcome channel id
+  channel = guild.get_channel(791606163954991146 ) #(834028832729858069)
+
+  new_user = member.name
+
+# Opening the welcome banner
+  img = Image.open("Welcome-01.png")
+
+# Getting the avatar of the currently joined user
+  avatar_image = member.avatar_url
+  data = BytesIO(await avatar_image.read())
+  pfp = Image.open(data)
+
+# Drawing the text to display on the welcome banner, i.e , new user name
+  draw = ImageDraw.Draw(img)
+  font = ImageFont.truetype('Bangers-Regular.ttf',224)
+  text = str(new_user)
+  draw.text((965, 650),text, (255, 255, 255), font = font)
+
+# creating an mask for avatar to look like a circel cropped image
+  size = (512, 512)
+  mask = Image.new('L', size, 255)
+  draw = ImageDraw.Draw(mask)
+  draw.ellipse((0, 0) + size, fill=0)
+
+# Masking out the new user pfp with a circle 
+  output = ImageOps.fit(pfp, mask.size, centering=(0.5, 0.5))
+  output.paste(0, mask=mask)
+  output.convert('P', palette=Image.ADAPTIVE)
+
+# Combining the pfp with the banner
+  img.paste(output, (337,530))
+  img.save('welcome_banner.gif')
+
+# sending the banner in welcome channel
+  await channel.send(file = discord.File('welcome_banner.gif'))
+
+# embed to display what they have to do
+  embed = discord.Embed(title = "H E Y !  " + new_user, description="Introduce yourself in #🥰-introduce-yourself channel", color=0xff1095)
+  embed.set_author(name="PDC", icon_url="https://i.ibb.co/25bJnkk/1.png")
+
+  await channel.send(embed=embed)
+
 #Keep Alive
 keep_alive()
 
