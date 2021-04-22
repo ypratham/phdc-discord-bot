@@ -12,7 +12,10 @@ from io import BytesIO
 
 
 #Variables
-client = discord.Client()
+intents = discord.Intents.default()
+intents.members = True
+client = discord.Client(intents=intents)
+
 
 bad_words = [
     "Fuck", "fuck", "Fuck You", "Shit", "Piss off", "Fuck off", "Dick head",
