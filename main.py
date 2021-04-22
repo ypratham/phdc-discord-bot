@@ -8,6 +8,7 @@ import random
 from replit import db
 from keep_alive import keep_alive
 from PIL import Image, ImageFont, ImageDraw, ImageOps
+from io import BytesIO
 
 
 #Variables
