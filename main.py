@@ -12,7 +12,10 @@ from io import BytesIO
 
 
 #Variables
-client = discord.Client()
+intents = discord.Intents.default()
+intents.members = True
+client = discord.Client(intents=intents)
+
 
 bad_words = [
     "Fuck", "fuck", "Fuck You", "Shit", "Piss off", "Fuck off", "Dick head",
@@ -262,7 +265,7 @@ async def on_member_join(member):
   new_user = member.name
 
 # Opening the welcome banner
-  img = Image.open("Welcome-01.png")
+  img = Image.open("welcome-04.png")
 
 # Getting the avatar of the currently joined user
   avatar_image = member.avatar_url
